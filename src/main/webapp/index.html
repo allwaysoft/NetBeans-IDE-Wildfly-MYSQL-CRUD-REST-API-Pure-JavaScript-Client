@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Books</title>
+        <link rel="stylesheet" href="style.css" type="text/css">
+    </head>
+
+    <body>
+
+        <!--New Driver Form-->
+        <div class="content">
+            <form id="new-book" method="POST" action="">
+                <fieldset>
+                    <legend>New Book</legend>
+                    <label for="new-book-bid">bid</label>
+                    <input id="new-book-bid" type="text" name="book-bid">
+                    <label for="new-book-author">author</label>
+                    <input id="new-book-author" type="text" name="book-author">
+                    <label for="new-book-status">status</label>
+                    <input id="new-book-status" type="text" name="book-status">
+                    <label for="new-book-status">title</label>
+                    <input id="new-book-title" type="text" name="book-title">
+                    <input type="submit" value="Save">
+                </fieldset>
+            </form>
+        </div>
+        <!--Drivers Table-->
+        <div class="content">
+            <div id="books-table" style="display:table;width:100%;">
+                <div style="display:table-row;">
+                    <div id="book-bid-header" style="display:table-cell;"><b>bid</b></div>
+                    <div id="book-author-header" style="display:table-cell;"><b>author</b></div>
+                    <div id="book-status-header" style="display:table-cell;"><b>status</b></div>
+                    <div id="book-title-header" style="display:table-cell;"><b>title</b></div>
+                    <div id="book-udpate" style="display:table-cell;"><b>&nbsp;</b></div>
+                    <div id="book-delete" style="display:table-cell;"><b>&nbsp;</b></div>
+                </div>
+            </div>
+        </div>
+        <!--Javascript-->
+        <script src="script.js"></script>
+    </body>
+
+</html>
