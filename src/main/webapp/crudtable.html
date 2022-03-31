@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Books</title>
+    </head>
+    <body>
+
+        <div class="container">
+            <h1>Books CRUD</h1>
+            <fieldset>
+                <legend>New Book</legend>
+                <form id="addcustomerform">
+                    <div class="form-group">
+                        <label>bid:</label>
+                        <input type="text" name="txtbid" id="txtbid" class="form-control" value="" required="">
+                    </div>
+                    <div class="form-group">
+                        <label>author:</label>
+                        <input type="text" name="txtauthor" id="txtauthor" class="form-control" value="" required="">
+                    </div>
+                    <div class="form-group">
+                        <label>status:</label>
+                        <input type="text" name="txtstatus" id="txtstatus" class="form-control" value="" required="">
+                    </div>
+                    <div class="form-group">
+                        <label>title:</label>
+                        <input type="text" name="txttitle" id="txttitle" class="form-control" value="" required="">
+                    </div>
+                    <button type="submit" id="btnaddBook" class="btn btn-primary save-btn">Save</button>
+
+                </form>
+            </fieldset>
+
+            <br />
+            <fieldset>
+                <legend>Book List
+                </legend>
+                <table class="table" border="1">
+                    <thead>
+                        <tr>
+                            <th>bid</th>
+                            <th>author</th>
+                            <th>status</th>
+                            <th>title</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblbody">
+
+                    </tbody>
+                </table>
+            </fieldset>
+        </div>
+        <script type="text/javascript">
+            var SERVER = 'http://localhost:8080/bookwildfly-1.0-SNAPSHOT/resources/com.example.bookwildfly.book';
+            document.addEventListener('DOMContentLoaded', function (event) {
+                /**
+                 * Build books table from database read over HTML
+                 */
+                var req = new XMLHttpRequest();
+                req.open('GET', SERVER, true);
+                req.onload = function () {
+
+                    if (req.status === 200) {
+                        var books = JSON.parse(req.responseText);
+                        /**
+                         * Fill books table with data
+                         */
+                        books.forEach(function (book) {
+                            var bid = book.bid;
+                            var author = book.author;
+                            var status = book.status;
+                            var title = book.title;
+                            var btneditId = "btnedit" + bid;
+                            var btndeleteId = "btndelete" + bid;
+                            var tablerow = "<tr Id='" + bid + "'   data-bid='" + bid + "'   data-author='" + author + "' data-status='" + status + "'   data-title='" + title + "'>"
+
+                                    + "<td class='td-data'>" + bid + "</td>"
+                                    + "<td class='td-data'>" + author + "</td>"
+                                    + "<td class='td-data'>" + status + "</td>"
+                                    + "<td class='td-data'>" + title + "</td>"
+                                    + "<td class='td-data'>" +
+                                    "<button id='" + btneditId + "' class='btn btn-info btn-xs btn-editcustomer' onclick='showEditRow(" + bid + ")'><i class='fa fa-pencil' aria-hidden='true'></i>Edit</button>" +
+                                    "<button id='" + btndeleteId + "' class='btn btn-danger btn-xs btn-deleteBook' onclick='deleteBookRow(" + bid + ")'><i class='fa fa-trash' aria-hidden='true'>Delete</button>"
+                                    + "</td>"
+                                    + "</tr>";
+
+                            document.getElementById('tblbody').innerHTML += tablerow;
+                            document.getElementById('txtbid').value = "";
+                            document.getElementById('txtauthor').value = "";
+                            document.getElementById('txtstatus').value = "";
+                            document.getElementById('txttitle').value = "";
+                        });
+                    }
+                };
+                req.send();
+
+            });
+
+            document.getElementById("btnaddBook").addEventListener("click", function (event) {
+                event.preventDefault()
+                var bid = document.getElementById("txtbid").value;
+                var author = document.getElementById("txtauthor").value;
+                var status = document.getElementById("txtstatus").value;
+                var title = document.getElementById("txttitle").value;
+                var data = JSON.stringify({
+                    bid: bid,
+                    author: author,
+                    status: status,
+                    title: title
+                });
+
+
+                var req = new XMLHttpRequest();
+                req.withCredentials = true;
+                var url = `${SERVER}`;
+
+                req.open('POST', url, true);
+                req.onload = function () {
+                    console.log(req.status);
+                    if (req.status === 204) {
+                        var btneditId = "btnedit" + bid;
+                        var btndeleteId = "btndelete" + bid;
+                        var tablerow = "<tr Id='" + bid + "'   data-bid='" + bid + "'   data-author='" + author + "' data-status='" + status + "'   data-title='" + title + "'>"
+
+                                + "<td class='td-data'>" + bid + "</td>"
+                                + "<td class='td-data'>" + author + "</td>"
+                                + "<td class='td-data'>" + status + "</td>"
+                                + "<td class='td-data'>" + title + "</td>"
+                                + "<td class='td-data'>" +
+                                "<button id='" + btneditId + "' class='btn btn-info btn-xs btn-editcustomer' onclick='showEditRow(" + bid + ")'><i class='fa fa-pencil' aria-hidden='true'></i>Edit</button>" +
+                                "<button id='" + btndeleteId + "' class='btn btn-danger btn-xs btn-deleteBook' onclick='deleteBookRow(" + bid + ")'><i class='fa fa-trash' aria-hidden='true'>Delete</button>"
+                                + "</td>"
+                                + "</tr>";
+
+                        document.getElementById('tblbody').innerHTML += tablerow;
+                        document.getElementById('txtbid').value = "";
+                        document.getElementById('txtauthor').value = "";
+                        document.getElementById('txtstatus').value = "";
+                        document.getElementById('txttitle').value = "";
+                    }
+                };
+                req.setRequestHeader("Content-Type", "application/json");
+                req.send(data);
+
+
+            });
+
+            function showEditRow(bid)
+            {
+
+                var BookRow = document.getElementById(bid); //this gives tr of  whose button was clicked
+
+                var data = BookRow.querySelectorAll(".td-data");
+
+                /*returns array of all elements with
+                 "row-data" class within the row with given id*/
+
+                var bid = data[0].innerHTML;
+                var author = data[1].innerHTML;
+                var status = data[2].innerHTML;
+                var title = data[3].innerHTML;
+                var btneditId = "btnedit" + bid;
+                data[0].innerHTML = '<input name="txtupdate_bid"  disabled id="txtupdate_bid" value="' + bid + '"/>';
+                data[1].innerHTML = '<input name="txtupdate_author" id="txtupdate_author" value="' + author + '"/>';
+                data[2].innerHTML = '<input name="txtupdate_status" id="txtupdate_status" value="' + status + '"/>';
+                data[3].innerHTML = '<input name="txtupdate_title" id="txtupdate_title" value="' + title + '"/>';
+
+                data[4].innerHTML =
+                        "<button class='btn btn-primary btn-xs btn-updateBook' onclick='updateBookRow(" + bid + ")'>" +
+                        "<i class='fa fa-pencil' aria-hidden='true'></i>Update</button>"
+                        + "<button class='btn btn-warning btn-xs btn-cancelUpdate' onclick='cancelUpdate(" + bid + ")'><i class='fa fa-times' aria-hidden='true'></i>Cancel</button>"
+                        + "<button class='btn btn-danger btn-xs btn-deleteBook' onclick='deleteBookRow(" + bid + ")'>"
+                        + "<i class='fa fa-trash' aria-hidden='true'></i>Delete</button>"
+            }
+            function cancelUpdate(bid)
+            {
+
+                var btneditId = "btnedit" + bid;
+                var btndeleteId = "btndelete" + bid;
+
+                var BookRow = document.getElementById(bid); //this gives tr of  whose button was clicked
+                var data = BookRow.querySelectorAll(".td-data");
+
+                var author = BookRow.getAttribute("data-author");
+                var status = BookRow.getAttribute("data-status");
+                var title = BookRow.getAttribute("data-title");
+
+
+                data[0].innerHTML = bid;
+                data[1].innerHTML = author;
+                data[2].innerHTML = status;
+                data[3].innerHTML = title;
+
+                var actionbtn = "<button id='" + btneditId + "' class='btn btn-info btn-xs btn-editcustomer' onclick='showEditRow(" + bid + ")'><i class='fa fa-pencil' aria-hidden='true'></i>Edit</button>" +
+                        "<button id='" + btndeleteId + "' class='btn btn-danger btn-xs btn-deleteBook' onclick='deleteBookRow(" + bid + ")'><i class='fa fa-trash' aria-hidden='true'>Delete</button>"
+                data[4].innerHTML = actionbtn;
+            }
+            function deleteBookRow(bid)
+            {
+
+
+                var req = new XMLHttpRequest();
+                var url = `${SERVER}/${bid}`;
+                req.open('DELETE', url, true);
+                req.onload = function () {
+                    if (req.status === 204) {
+                        document.getElementById(bid).remove();
+                    }
+                };
+                req.send();
+            }
+            function updateBookRow(bid)
+            {
+
+                var BookRow = document.getElementById(bid); //this gives tr of  whose button was clicked
+                var data = BookRow.querySelectorAll(".td-data");
+
+                var author = data[1].querySelector("#txtupdate_author").value;
+                var status = data[2].querySelector("#txtupdate_status").value;
+                var title = data[3].querySelector("#txtupdate_title").value;
+
+
+
+                var data = JSON.stringify({
+                    bid: bid,
+                    author: author,
+                    status: status,
+                    title: title
+                });
+
+
+                var req = new XMLHttpRequest();
+                var url = `${SERVER}/${bid}`;
+                req.open('PUT', url, true);
+                req.onload = function () {
+                    if (req.status === 204) {
+                        var btneditId = "btnedit" + bid;
+                        var btndeleteId = "btndelete" + bid;
+
+                        var BookRow = document.getElementById(bid); //this gives tr of  whose button was clicked
+                        var data = BookRow.querySelectorAll(".td-data");
+
+                        var author = data[1].querySelector("#txtupdate_author").value;
+                        var status = data[2].querySelector("#txtupdate_status").value;
+                        var title = data[3].querySelector("#txtupdate_title").value;
+                        data[0].innerHTML = bid;
+                        data[1].innerHTML = author;
+                        data[2].innerHTML = status;
+                        data[3].innerHTML = title;
+                        var actionbtn = "<button id='" + btneditId + "' class='btn btn-info btn-xs btn-editcustomer' onclick='showEditRow(" + bid + ")'><i class='fa fa-pencil' aria-hidden='true'></i>Edit</button>" +
+                                "<button id='" + btndeleteId + "' class='btn btn-danger btn-xs btn-deleteBook' onclick='deleteBookRow(" + bid + ")'><i class='fa fa-trash' aria-hidden='true'>Delete</button>"
+                        data[4].innerHTML = actionbtn;
+
+                    }
+                };
+                req.setRequestHeader("Content-Type", "application/json");
+                req.send(data);
+
+            }
+        </script>
+    </body>
+</html>
